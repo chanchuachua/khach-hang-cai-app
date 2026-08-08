@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra cứu Khách hàng Cài App</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            max-width: 650px; 
+            margin: 40px auto; 
+            padding: 20px; 
+            color: #333;
+        }
+        h2 { text-align: center; color: #0056b3; }
+        .search-container { display: flex; gap: 10px; margin-bottom: 25px; }
+        input { 
+            flex: 1; 
+            padding: 12px 15px; 
+            font-size: 16px; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+            outline: none;
+        }
+        input:focus { border-color: #0056b3; box-shadow: 0 0 5px rgba(0,86,179,0.2); }
+        button { 
+            padding: 12px 25px; 
+            font-size: 16px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: bold;
+        }
+        button:hover { background-color: #0056b3; }
+        
+        #ketQua { margin-top: 20px; }
+        .item { 
+            padding: 18px; 
+            border: 1px solid #e0e0e0; 
+            border-radius: 8px; 
+            background-color: #fff; 
+            margin-bottom: 15px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .item-title { 
+            font-size: 18px; 
+            color: #d32f2f; 
+            margin-bottom: 10px; 
+            font-weight: bold;
+        }
+        .item-info { margin-bottom: 6px; line-height: 1.5; }
+        .badge { 
+            display: inline-block; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            background-color: #e8f5e9; 
+            color: #2e7d32; 
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Tra cứu Khách hàng Cài App</h2>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Nhập Mã khách hàng (VD: PB070400...)" onkeypress="handleKeyPress(event)">
+        <button onclick="thucHienTraCuu()">Tra cứu</button>
+    </div>
+
+    <div id="ketQua">Kết quả sẽ hiển thị ở đây...</div>
+
+    <!-- Nạp thư viện Supabase -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+        // 1. DÁN URL VÀ KHÓA CỦA DỰ ÁN "tracuudulieu" VÀO ĐÂY
+        const supabaseUrl = 'https://kezzrlltzddpdtktfqzk.supabase.co' 
+        const supabaseKey = 'sb_publishable_-OA922t0e8G3z3hM0hwguQ_GIAaGmec' 
+        const supabase = createClient(supabaseUrl, supabaseKey)
+
+        // Hàm hỗ trợ nhấn Enter để tìm kiếm
+        window.handleKeyPress = function(e) {
+            if (e.key === 'Enter') {
+                thucHienTraCuu();
+            }
+        }
+
+        // 2. HÀM XỬ LÝ TRA CỨU
+        window.thucHienTraCuu = async function() {
+            const tuKhoa = document.getElementById('searchInput').value.trim();
+            const ketQuaDiv = document.getElementById('ketQua');
+            
+            if (!tuKhoa) {
+                ketQuaDiv.innerHTML = "<span style='color: #d32f2f;'>Vui lòng nhập Mã khách hàng!</span>";
+                return;
+            }
+
+            ketQuaDiv.innerHTML = "Đang tải dữ liệu...";
+
+            // 3. GỌI API TỪ BẢNG "khach_hang_cai_app"
+            const { data, error } = await supabase
+                .from('khach_hang_cai_app') // Tên bảng bạn đã tạo
+                .select('*')
+                .ilike('Mã khách hàng', `%${tuKhoa}%`); // Tìm chính xác theo cột Mã khách hàng
+
+            // 4. XỬ LÝ VÀ HIỂN THỊ KẾT QUẢ
+            if (error) {
+                ketQuaDiv.innerHTML = `<span style="color: red;">Lỗi truy xuất dữ liệu: ${error.message}</span>`;
+                return;
+            }
+
+            if (data.length === 0) {
+                ketQuaDiv.innerHTML = "Không tìm thấy khách hàng nào khớp với mã trên.";
+                return;
+            }
+
+            let html = "";
+            data.forEach(item => {
+                // In ra các thông tin dựa theo đúng tên cột trong file Excel
+                html += `
+                    <div class="item">
+                        <div class="item-title">${item['Tên khách hàng']} - ${item['Mã khách hàng']}</div>
+                        <div class="item-info"><strong>Đơn vị quản lý:</strong> ${item['Tên đơn vị quản lý']}</div>
+                        <div class="item-info"><strong>Ngày liên kết lần đầu:</strong> ${item['Ngày liên kết lần đầu'] || 'N/A'}</div>
+                        <div class="item-info"><strong>Ngày liên kết gần nhất:</strong> ${item['Ngày liên kết gần nhất'] || 'N/A'}</div>
+                        <div class="badge">${item['Tình Trạng']}</div>
+                    </div>
+                `;
+            });
+            ketQuaDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
