@@ -224,10 +224,12 @@
 
             resultBox.innerHTML = `<p style="color: #666; text-align: center; font-weight: bold;">⏳ Đang truy xuất dữ liệu từ máy chủ...</p>`;
 
+            // 1. TỐI ƯU HÓA TUYỆT ĐỐI: Gỡ bỏ lệnh count, chỉ yêu cầu giới hạn đúng 11 dòng
             const { data, error } = await client
                 .from('khach_hang_cai_app') 
-                .select('*')
-                .or(`"Mã khách hàng".ilike.%${searchPattern}%,"Tên khách hàng".ilike.%${searchPattern}%`); 
+                .select('*') 
+                .or(`"Mã khách hàng".ilike.%${searchPattern}%,"Tên khách hàng".ilike.%${searchPattern}%`)
+                .limit(11); 
 
             if (error) {
                 resultBox.innerHTML = `<div class="card"><div class="card-body"><p style="color: red; text-align: center; margin:0;">Lỗi kết nối: ${error.message}</p></div></div>`;
@@ -235,18 +237,19 @@
             }
 
             if (data.length > 0) {
-                // Hiển thị TỔNG SỐ kết quả tìm được và thêm GHI CHÚ
+                // 2. XỬ LÝ LOGIC "N + 1"
+                const hasMore = data.length > 10; // Kiểm tra xem có chạm mức 11 không
+                const displayText = hasMore ? '> 10' : data.length; // Nếu có, ghi "> 10", ngược lại ghi số thực tế
+                const displayData = hasMore ? data.slice(0, 10) : data; // Dù tải 11 dòng, nhưng chỉ xuất ra màn hình 10 dòng đầu
+
                 let html = `
                     <p style="color: #28a745; font-weight: bold; margin-bottom: 15px;">
-                        ✔ Tìm thấy ${data.length} kết quả <span style="font-weight: normal; color: #d32f2f; font-style: italic; font-size: 14px;">(Hệ thống chỉ hiện tối đa 10 kết quả)</span>:
+                        ✔ Tìm thấy ${displayText} kết quả <span style="font-weight: normal; color: #d32f2f; font-style: italic; font-size: 14px;">(Hệ thống chỉ hiện tối đa 10 kết quả)</span>:
                     </p>
                     <div class="card-container">
                 `;
                 
-                // CẮT DỮ LIỆU: Chỉ lấy tối đa 10 phần tử đầu tiên để hiển thị
-                const displayData = data.slice(0, 10);
-                
-                // Vòng lặp bây giờ chỉ chạy tối đa 10 lần
+                // 3. Vòng lặp xuất dữ liệu
                 displayData.forEach((thongTin, index) => {
                     const rawStatus = thongTin['Tình Trạng'] || '';
                     const statusColor = rawStatus.toLowerCase().includes('đã cài') ? '#28a745' : '#d32f2f';
