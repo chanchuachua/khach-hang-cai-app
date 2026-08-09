@@ -3,137 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tra cứu Khách hàng Cài App</title>
+    <title>Tra cứu Khách hàng cài APP</title>
     <style>
+        /* CSS Giao diện chung */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            max-width: 650px; 
-            margin: 40px auto; 
-            padding: 20px; 
-            color: #333;
+            background-color: #f0f2f5; 
+            padding: 20px 10px; /* Padding thu nhỏ lại để tối ưu không gian màn hình điện thoại */
+            margin: 0;
         }
-        h2 { text-align: center; color: #0056b3; }
-        .search-container { display: flex; gap: 10px; margin-bottom: 25px; }
+        .container { 
+            max-width: 800px; 
+            margin: auto; 
+            background: white; 
+            padding: 25px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        }
+        h2 { 
+            text-align: center; 
+            color: #1a73e8; 
+            margin-bottom: 25px;
+            font-weight: 700;
+            font-size: 24px;
+        }
+        
+        /* Box tìm kiếm tự động co dãn */
+        .search-box { 
+            display: flex;
+            flex-direction: column; /* Mặc định xếp dọc nút bấm và ô tìm cho mọi thiết bị nhỏ */
+            gap: 12px; 
+        }
+        @media (min-width: 600px) {
+            .search-box { flex-direction: row; } /* Chỉ dàn ngang khi màn hình đủ rộng (Máy tính/Tablet) */
+        }
         input { 
             flex: 1; 
-            padding: 12px 15px; 
-            font-size: 16px; 
-            border: 1px solid #ccc; 
-            border-radius: 6px; 
+            padding: 14px 18px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            font-size: 16px;
             outline: none;
+            transition: all 0.3s;
         }
-        input:focus { border-color: #0056b3; box-shadow: 0 0 5px rgba(0,86,179,0.2); }
+        input:focus { 
+            border-color: #1a73e8; 
+            box-shadow: 0 0 8px rgba(26,115,232,0.2);
+        }
         button { 
-            padding: 12px 25px; 
-            font-size: 16px; 
-            background-color: #007bff; 
+            padding: 14px 35px; 
+            background: #1a73e8; 
             color: white; 
             border: none; 
-            border-radius: 6px; 
+            border-radius: 8px; 
             cursor: pointer; 
             font-weight: bold;
+            font-size: 16px;
+            white-space: nowrap;
+            transition: background 0.3s;
         }
-        button:hover { background-color: #0056b3; }
+        button:hover { 
+            background: #1557b0; 
+        }
         
-        #ketQua { margin-top: 20px; }
-        .item { 
-            padding: 18px; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 8px; 
-            background-color: #fff; 
-            margin-bottom: 15px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        #resultArea { 
+            margin-top: 25px; 
         }
-        .item-title { 
-            font-size: 18px; 
-            color: #d32f2f; 
-            margin-bottom: 10px; 
+
+        /* --- GIAO DIỆN THẺ (CARD) ĐỒNG NHẤT CHO MỌI THIẾT BỊ --- */
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px; /* Khoảng cách giữa các Thẻ */
+        }
+        
+        .card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Phần đầu thẻ (Hiển thị STT và Trạng thái) */
+        .card-header {
+            background-color: #f8f9fa;
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stt-badge {
+            background-color: #1a73e8;
+            color: white;
             font-weight: bold;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 20px;
         }
-        .item-info { margin-bottom: 6px; line-height: 1.5; }
-        .badge { 
-            display: inline-block; 
-            padding: 4px 10px; 
-            border-radius: 12px; 
-            font-size: 13px; 
-            font-weight: bold; 
-            background-color: #e8f5e9; 
-            color: #2e7d32; 
-            margin-top: 5px;
+        .status-badge {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Phần nội dung thẻ */
+        .card-body {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* Khoảng cách dọc giữa các dòng dữ liệu */
+        }
+        
+        /* Từng dòng dữ liệu trong thẻ */
+        .data-row {
+            display: flex;
+            justify-content: space-between; /* Nhãn trái, Giá trị phải */
+            align-items: flex-start; /* Nếu văn bản nhiều dòng, nhãn vẫn neo ở trên cùng */
+            gap: 15px; /* Chừa khoảng trống giữa nhãn và giá trị */
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #f0f0f0;
+        }
+        .data-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        /* Nhãn (Tiêu đề cột) */
+        .data-label {
+            color: #666;
+            font-size: 14px;
+            min-width: 130px; /* Đảm bảo nhãn có một độ rộng tối thiểu, không bị bóp méo */
+            flex-shrink: 0;
+        }
+        
+        /* Giá trị dữ liệu (Giải quyết bài toán chữ quá dài) */
+        .data-value {
+            color: #222;
+            font-size: 15px;
+            text-align: right; 
+            word-wrap: break-word; /* Tự động bẻ xuống dòng */
+            word-break: break-word; /* Cắt chữ nếu một từ quá dài dính liền nhau */
+        }
+        
+        /* Highlight từ khóa */
+        .highlight {
+            background-color: #fff176;
+            color: #d32f2f;
+            padding: 0 2px;
+            border-radius: 3px;
+        }
+        .text-blue { color: #0056b3; }
+        .font-bold { font-weight: bold; }
+
+        /* Chữ ký */
+        .watermark {
+            position: fixed;
+            bottom: 15px;
+            left: 15px;
+            font-size: 13px;
+            color: #999;
+            line-height: 1.5;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
 
-    <h2>Tra cứu Khách hàng Cài App</h2>
-    
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="Nhập Mã khách hàng (VD: PB070400...)" onkeypress="handleKeyPress(event)">
-        <button onclick="thucHienTraCuu()">Tra cứu</button>
+    <div class="container">
+        <h2>Tra cứu Khách hàng cài APP</h2>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Nhập mã hoặc tên khách hàng (VD: PB07...)" onkeypress="handleKeyPress(event)">
+            <button onclick="fetchData()">Tra cứu</button>
+        </div>
+        
+        <div id="resultArea"></div>
     </div>
 
-    <div id="ketQua">Kết quả sẽ hiển thị ở đây...</div>
+    <!-- Nạp thư viện kết nối Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        const supabaseUrl = 'https://kezzrlltzddpdtktfqzk.supabase.co';
+        const supabaseKey = 'sb_publishable_-OA922t0e8G3z3hM0hwguQ_GIAaGmec';
+        const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-    <!-- Nạp thư viện Supabase -->
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
-
-        // 1. DÁN URL VÀ KHÓA CỦA DỰ ÁN "tracuudulieu" VÀO ĐÂY
-        const supabaseUrl = 'https://kezzrlltzddpdtktfqzk.supabase.co' 
-        const supabaseKey = 'sb_publishable_-OA922t0e8G3z3hM0hwguQ_GIAaGmec' 
-        const supabase = createClient(supabaseUrl, supabaseKey)
-
-        // Hàm hỗ trợ nhấn Enter để tìm kiếm
-        window.handleKeyPress = function(e) {
+        function handleKeyPress(e) {
             if (e.key === 'Enter') {
-                thucHienTraCuu();
+                fetchData();
             }
         }
 
-        // 2. HÀM XỬ LÝ TRA CỨU
-        window.thucHienTraCuu = async function() {
-            const tuKhoa = document.getElementById('searchInput').value.trim();
-            const ketQuaDiv = document.getElementById('ketQua');
-            
-            if (!tuKhoa) {
-                ketQuaDiv.innerHTML = "<span style='color: #d32f2f;'>Vui lòng nhập Mã khách hàng!</span>";
+        function highlightText(text, keywordStr) {
+            if (!text) return '';
+            let resultString = String(text);
+            const words = keywordStr.split(/\s+/).filter(w => w.length > 0);
+            words.forEach(word => {
+                const regex = new RegExp(`(${word})`, 'gi');
+                resultString = resultString.replace(regex, '<span class="highlight">$1</span>');
+            });
+            return resultString;
+        }
+
+        async function fetchData() {
+            const rawKeyword = document.getElementById('searchInput').value.trim();
+            const resultBox = document.getElementById('resultArea');
+
+            if (rawKeyword === "") {
+                alert("Vui lòng nhập thông tin để tra cứu!");
                 return;
             }
 
-            ketQuaDiv.innerHTML = "Đang tải dữ liệu...";
+            const safeKeyword = rawKeyword.replace(/,/g, ' ');
+            const searchPattern = safeKeyword.replace(/\s+/g, '%');
 
-            // 3. GỌI API TỪ BẢNG "khach_hang_cai_app"
-            const { data, error } = await supabase
-                .from('khach_hang_cai_app') // Tên bảng bạn đã tạo
+            resultBox.innerHTML = `<p style="color: #666; text-align: center; font-weight: bold;">⏳ Đang truy xuất dữ liệu từ máy chủ...</p>`;
+
+            const { data, error } = await client
+                .from('khach_hang_cai_app') 
                 .select('*')
-                .ilike('Mã khách hàng', `%${tuKhoa}%`); // Tìm chính xác theo cột Mã khách hàng
+                .or(`"Mã khách hàng".ilike.%${searchPattern}%,"Tên khách hàng".ilike.%${searchPattern}%`); 
 
-            // 4. XỬ LÝ VÀ HIỂN THỊ KẾT QUẢ
             if (error) {
-                ketQuaDiv.innerHTML = `<span style="color: red;">Lỗi truy xuất dữ liệu: ${error.message}</span>`;
+                resultBox.innerHTML = `<div class="card"><div class="card-body"><p style="color: red; text-align: center; margin:0;">Lỗi kết nối: ${error.message}</p></div></div>`;
                 return;
             }
 
-            if (data.length === 0) {
-                ketQuaDiv.innerHTML = "Không tìm thấy khách hàng nào khớp với mã trên.";
-                return;
-            }
+            if (data.length > 0) {
+                let html = `
+                    <p style="color: #28a745; font-weight: bold; margin-bottom: 15px;">✔ Tìm thấy ${data.length} kết quả:</p>
+                    <div class="card-container">
+                `;
+                
+                // Xuất dữ liệu thẳng ra các thẻ div (Card) thay vì dùng thẻ table
+                data.forEach((thongTin, index) => {
+                    // Xử lý màu trạng thái (Đã cài App thì màu xanh, ngược lại màu đỏ/cam)
+                    const rawStatus = thongTin['Tình Trạng'] || '';
+                    const statusColor = rawStatus.toLowerCase().includes('đã cài') ? '#28a745' : '#d32f2f';
 
-            let html = "";
-            data.forEach(item => {
-                // In ra các thông tin dựa theo đúng tên cột trong file Excel
-                html += `
-                    <div class="item">
-                        <div class="item-title">${item['Tên khách hàng']} - ${item['Mã khách hàng']}</div>
-                        <div class="item-info"><strong>Đơn vị quản lý:</strong> ${item['Tên đơn vị quản lý']}</div>
-                        <div class="item-info"><strong>Ngày liên kết lần đầu:</strong> ${item['Ngày liên kết lần đầu'] || 'N/A'}</div>
-                        <div class="item-info"><strong>Ngày liên kết gần nhất:</strong> ${item['Ngày liên kết gần nhất'] || 'N/A'}</div>
-                        <div class="badge">${item['Tình Trạng']}</div>
+                    html += `
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="stt-badge">STT: ${index + 1}</span>
+                                <span class="status-badge" style="color: ${statusColor};">${rawStatus}</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="data-row">
+                                    <span class="data-label">Mã KH:</span>
+                                    <span class="data-value text-blue font-bold">${highlightText(thongTin['Mã khách hàng'], safeKeyword)}</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Tên Khách Hàng:</span>
+                                    <span class="data-value font-bold">${highlightText(thongTin['Tên khách hàng'], safeKeyword)}</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Đơn vị quản lý:</span>
+                                    <span class="data-value">${thongTin['Tên đơn vị quản lý'] || ''}</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Ngày liên kết đầu:</span>
+                                    <span class="data-value">${thongTin['Ngày liên kết lần đầu'] || ''}</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Ngày liên kết gần nhất:</span>
+                                    <span class="data-value">${thongTin['Ngày liên kết gần nhất'] || ''}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+                resultBox.innerHTML = html;
+            } else {
+                resultBox.innerHTML = `
+                    <div class="card" style="background-color: #ffebee; border-color: #ffcdd2;">
+                        <div class="card-body">
+                            <p style="color: #d32f2f; font-weight: bold; text-align: center; margin: 0;">Không tìm thấy khách hàng nào khớp với: "${rawKeyword}"</p>
+                        </div>
                     </div>
                 `;
-            });
-            ketQuaDiv.innerHTML = html;
+            }
         }
     </script>
+
+    <!-- Chữ ký cá nhân -->
+    <div class="watermark">
+        Người thiết lập:<br>
+        <strong>Chan Canh Chua (C3)</strong>
+    </div>
 </body>
 </html>
