@@ -235,14 +235,19 @@
             }
 
             if (data.length > 0) {
+                // Hiển thị TỔNG SỐ kết quả tìm được và thêm GHI CHÚ
                 let html = `
-                    <p style="color: #28a745; font-weight: bold; margin-bottom: 15px;">✔ Tìm thấy ${data.length} kết quả:</p>
+                    <p style="color: #28a745; font-weight: bold; margin-bottom: 15px;">
+                        ✔ Tìm thấy ${data.length} kết quả <span style="font-weight: normal; color: #d32f2f; font-style: italic; font-size: 14px;">(Hệ thống chỉ hiện tối đa 10 kết quả)</span>:
+                    </p>
                     <div class="card-container">
                 `;
                 
-                // Xuất dữ liệu thẳng ra các thẻ div (Card) thay vì dùng thẻ table
-                data.forEach((thongTin, index) => {
-                    // Xử lý màu trạng thái (Đã cài App thì màu xanh, ngược lại màu đỏ/cam)
+                // CẮT DỮ LIỆU: Chỉ lấy tối đa 10 phần tử đầu tiên để hiển thị
+                const displayData = data.slice(0, 10);
+                
+                // Vòng lặp bây giờ chỉ chạy tối đa 10 lần
+                displayData.forEach((thongTin, index) => {
                     const rawStatus = thongTin['Tình Trạng'] || '';
                     const statusColor = rawStatus.toLowerCase().includes('đã cài') ? '#28a745' : '#d32f2f';
 
