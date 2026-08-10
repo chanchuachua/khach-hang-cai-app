@@ -138,7 +138,7 @@
         .data-label {
             color: #666;
             font-size: 14px;
-            min-width: 130px; /* Đảm bảo nhãn có một độ rộng tối thiểu, không bị bóp méo */
+            min-width: 110px; /* ĐÃ SỬA: Đảm bảo nhãn thu gọn lại */
             flex-shrink: 0;
         }
         
@@ -278,7 +278,7 @@
                                     <span class="data-value">${thongTin['Ngày liên kết lần đầu'] || ''}</span>
                                 </div>
                                 <div class="data-row">
-                                    <span class="data-label">Ngày liên kết gần nhất:</span>
+                                    <span class="data-label">Ngày liên kết gần<br>nhất:</span> <!-- ĐÃ SỬA: Chèn thẻ <br> ngắt dòng -->
                                     <span class="data-value">${thongTin['Ngày liên kết gần nhất'] || ''}</span>
                                 </div>
                             </div>
