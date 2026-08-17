@@ -176,7 +176,12 @@
 <body>
 
     <div class="container">
-        <h2>Khách hàng cài APP</h2>
+        <!-- ĐÃ SỬA: Thêm thẻ span để chứa tổng số dòng -->
+        <h2 style="margin-bottom: 5px;">Khách hàng cài APP</h2>
+        <p id="totalCount" style="text-align: center; color: #333; font-size: 14px; margin-top: 0; margin-bottom: 25px; font-style: italic;">
+            Đang tải dữ liệu...
+        </p>
+        
         <div class="search-box">
             <input type="text" id="searchInput" placeholder="Nhập mã hoặc tên (VD: Lê Ổi, PB07...)" onkeypress="handleKeyPress(event)">
             <button onclick="fetchData()">Tra cứu</button>
@@ -192,6 +197,22 @@
         const supabaseUrl = 'https://kezzrlltzddpdtktfqzk.supabase.co';
         const supabaseKey = 'sb_publishable_-OA922t0e8G3z3hM0hwguQ_GIAaGmec';
         const client = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // --- ĐOẠN CODE MỚI THÊM: Tự động đếm tổng số dòng khi mở web ---
+        window.onload = async function() {
+            const countElement = document.getElementById('totalCount');
+            const { count, error } = await client
+                .from('khach_hang_cai_app')
+                .select('*', { count: 'exact', head: true }); // Dùng head: true để chỉ lấy số đếm, không tải dữ liệu về gây nặng máy
+
+            if (error) {
+                countElement.innerHTML = `<span style="color: red;">(Lỗi tải dữ liệu)</span>`;
+            } else {
+                // Hiển thị định dạng (1.930)
+                countElement.innerHTML = `(${count.toLocaleString('vi-VN')})`;
+            }
+        };
+        // -------------------------------------------------------------
 
         function handleKeyPress(e) {
             if (e.key === 'Enter') {
