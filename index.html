@@ -152,7 +152,8 @@
 </head>
 <body>
     <div class="container">
-        <h2 style="margin-bottom: 5px;">Khách hàng cài APP</h2>
+        <!-- ĐÃ SỬA: Tiêu đề đồng bộ chữ App -->
+        <h2 style="margin-bottom: 5px;">Khách hàng cài App</h2>
         <p id="totalCount" style="text-align: center; color: #333; font-size: 14px; margin-top: 0; margin-bottom: 25px; font-style: italic;">
             Đang tải dữ liệu đếm...
         </p>
@@ -169,7 +170,6 @@
         const supabaseKey = 'sb_publishable_-OA922t0e8G3z3hM0hwguQ_GIAaGmec';
         const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // ĐÃ SỬA: Tính tỷ lệ phần trăm
         window.onload = async function() {
             const countElement = document.getElementById('totalCount');
             const countAppPromise = client.from('khach_hang_cai_app').select('*', { count: 'exact', head: true });
@@ -181,11 +181,12 @@
                 countElement.innerHTML = `<span style="color: red;">(Lỗi tải dữ liệu)</span>`;
             } else {
                 const daCai = resApp.count || 0;
-                let text = `(Đã cài APP: ${daCai.toLocaleString('vi-VN')})`;
+                // ĐÃ SỬA: Đồng bộ chữ App
+                let text = `(Đã cài App: ${daCai.toLocaleString('vi-VN')})`;
                 if (!resTong.error && resTong.count > 0) {
                     const tongKH = resTong.count;
                     const tyLe = ((daCai / tongKH) * 100).toFixed(2);
-                    text = `(Tổng KH: ${tongKH.toLocaleString('vi-VN')} | Đã cài APP: ${daCai.toLocaleString('vi-VN')} - ${tyLe}%)`;
+                    text = `(Tổng KH: ${tongKH.toLocaleString('vi-VN')} | Đã cài App: ${daCai.toLocaleString('vi-VN')} - ${tyLe}%)`;
                 }
                 countElement.innerHTML = text;
             }
@@ -241,15 +242,14 @@
 
             const combinedMap = new Map();
 
-            // Nhúng dữ liệu bảng TỔNG
             if (resTong.data) {
                 resTong.data.forEach(item => {
                     combinedMap.set(item['MA_KHANG'], {
                         'Mã khách hàng': item['MA_KHANG'],
                         'Tên khách hàng': item['TEN_KHANG'],
                         'Số điện thoại': item['DTHOAI'] || '',
-                        'Tên đơn vị': item['TEN_DVQL'] || '', // ĐÃ SỬA: Lấy từ cột TEN_DVQL
-                        'Tên trạm': item['TEN_TRAM'] || '',   // ĐÃ SỬA: Lấy từ cột TEN_TRAM
+                        'Tên đơn vị': item['TEN_DVQL'] || '', 
+                        'Tên trạm': item['TEN_TRAM'] || '',   
                         'Tình Trạng': 'Chưa cài App',
                         'Ngày liên kết lần đầu': '',
                         'Ngày liên kết gần nhất': ''
@@ -257,7 +257,6 @@
                 });
             }
 
-            // Nhúng dữ liệu bảng APP đè lên
             if (resApp.data) {
                 resApp.data.forEach(item => {
                     const exist = combinedMap.get(item['Mã khách hàng']) || {};
@@ -265,7 +264,7 @@
                         'Mã khách hàng': item['Mã khách hàng'],
                         'Tên khách hàng': item['Tên khách hàng'] || exist['Tên khách hàng'] || '',
                         'Số điện thoại': exist['Số điện thoại'] || '', 
-                        'Tên đơn vị': item['Tên đơn vị'] || exist['Tên đơn vị'] || '', // ĐÃ SỬA: Lấy từ cột Tên đơn vị
+                        'Tên đơn vị': item['Tên đơn vị'] || exist['Tên đơn vị'] || '', 
                         'Tên trạm': exist['Tên trạm'] || '',
                         'Tình Trạng': item['Tình trạng'] || item['Tình Trạng'] || 'Đã cài App',
                         'Ngày liên kết lần đầu': item['Ngày liên kết lần đầu'] || '',
@@ -289,11 +288,12 @@
                 `;
                 
                 displayData.forEach((thongTin, index) => {
-                    const rawStatus = thongTin['Tình Trạng'] || '';
+                    // ĐÃ SỬA: Ép kiểu hiển thị chuẩn "Đã cài App" và "Chưa cài App"
+                    let rawStatus = thongTin['Tình Trạng'] || '';
                     const isDaCai = rawStatus.toLowerCase().includes('đã cài');
+                    rawStatus = isDaCai ? 'Đã cài App' : 'Chưa cài App';
                     const statusColor = isDaCai ? '#28a745' : '#757575';
 
-                    // ĐÃ SỬA: Xây dựng cấu trúc HTML linh hoạt
                     let cardBodyHtml = `
                         <div class="data-row">
                             <span class="data-label">Mã KH:</span>
@@ -313,7 +313,6 @@
                         </div>
                     `;
 
-                    // ĐÃ SỬA: Hiển thị các cột khác nhau tùy theo trạng thái App
                     if (isDaCai) {
                         cardBodyHtml += `
                             <div class="data-row">
