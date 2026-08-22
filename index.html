@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khách hàng cài APP</title>
+    <title>Người Sở Hữu: Chan Canh Chua (C3)</title>
     <style>
-        /* CSS Giao diện chung */
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #f0f2f5; 
-            padding: 20px 10px; /* Padding thu nhỏ lại để tối ưu không gian màn hình điện thoại */
+            padding: 20px 10px; 
             margin: 0;
         }
         .container { 
@@ -23,19 +22,17 @@
         h2 { 
             text-align: center; 
             color: #1a73e8; 
-            margin-bottom: 25px;
+            margin-bottom: 5px;
             font-weight: 700;
             font-size: 24px;
         }
-        
-        /* Box tìm kiếm tự động co dãn */
         .search-box { 
             display: flex;
-            flex-direction: column; /* Mặc định xếp dọc nút bấm và ô tìm cho mọi thiết bị nhỏ */
+            flex-direction: column; 
             gap: 12px; 
         }
         @media (min-width: 600px) {
-            .search-box { flex-direction: row; } /* Chỉ dàn ngang khi màn hình đủ rộng (Máy tính/Tablet) */
+            .search-box { flex-direction: row; } 
         }
         input { 
             flex: 1; 
@@ -65,18 +62,12 @@
         button:hover { 
             background: #1557b0; 
         }
-        
-        #resultArea { 
-            margin-top: 25px; 
-        }
-
-        /* --- GIAO DIỆN THẺ (CARD) ĐỒNG NHẤT CHO MỌI THIẾT BỊ --- */
+        #resultArea { margin-top: 25px; }
         .card-container {
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Khoảng cách giữa các Thẻ */
+            gap: 15px; 
         }
-        
         .card {
             background: #fff;
             border: 1px solid #e0e0e0;
@@ -89,8 +80,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transform: translateY(-2px);
         }
-        
-        /* Phần đầu thẻ (Hiển thị STT và Trạng thái) */
         .card-header {
             background-color: #f8f9fa;
             padding: 12px 15px;
@@ -111,21 +100,17 @@
             font-weight: bold;
             font-size: 14px;
         }
-        
-        /* Phần nội dung thẻ */
         .card-body {
             padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 12px; /* Khoảng cách dọc giữa các dòng dữ liệu */
+            gap: 12px; 
         }
-        
-        /* Từng dòng dữ liệu trong thẻ */
         .data-row {
             display: flex;
-            justify-content: space-between; /* Nhãn trái, Giá trị phải */
-            align-items: flex-start; /* Nếu văn bản nhiều dòng, nhãn vẫn neo ở trên cùng */
-            gap: 15px; /* Chừa khoảng trống giữa nhãn và giá trị */
+            justify-content: space-between; 
+            align-items: flex-start; 
+            gap: 15px; 
             padding-bottom: 8px;
             border-bottom: 1px dashed #f0f0f0;
         }
@@ -133,25 +118,19 @@
             border-bottom: none;
             padding-bottom: 0;
         }
-        
-        /* Nhãn (Tiêu đề cột) */
         .data-label {
             color: #666;
             font-size: 14px;
-            min-width: 110px; /* ĐÃ SỬA: Đảm bảo nhãn thu gọn lại */
+            min-width: 110px; 
             flex-shrink: 0;
         }
-        
-        /* Giá trị dữ liệu (Giải quyết bài toán chữ quá dài) */
         .data-value {
             color: #222;
             font-size: 15px;
             text-align: right; 
-            word-wrap: break-word; /* Tự động bẻ xuống dòng */
-            word-break: break-word; /* Cắt chữ nếu một từ quá dài dính liền nhau */
+            word-wrap: break-word; 
+            word-break: break-word; 
         }
-        
-        /* Highlight từ khóa */
         .highlight {
             background-color: #fff176;
             color: #d32f2f;
@@ -160,8 +139,6 @@
         }
         .text-blue { color: #0056b3; }
         .font-bold { font-weight: bold; }
-
-        /* Chữ ký */
         .watermark {
             position: fixed;
             bottom: 15px;
@@ -174,50 +151,45 @@
     </style>
 </head>
 <body>
-
     <div class="container">
-        <!-- ĐÃ SỬA: Thêm thẻ span để chứa tổng số dòng -->
         <h2 style="margin-bottom: 5px;">Khách hàng cài APP</h2>
         <p id="totalCount" style="text-align: center; color: #333; font-size: 14px; margin-top: 0; margin-bottom: 25px; font-style: italic;">
-            Đang tải dữ liệu...
+            Đang tải dữ liệu đếm...
         </p>
-        
         <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Nhập mã hoặc tên (VD: Lê Ổi, PB07...)" onkeypress="handleKeyPress(event)">
+            <input type="text" id="searchInput" placeholder="Nhập mã hoặc tên..." onkeypress="handleKeyPress(event)">
             <button onclick="fetchData()">Tra cứu</button>
         </div>
-        
         <div id="resultArea"></div>
     </div>
 
-    <!-- Nạp thư viện kết nối Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script>
         const supabaseUrl = 'https://kezzrlltzddpdtktfqzk.supabase.co';
         const supabaseKey = 'sb_publishable_-OA922t0e8G3z3hM0hwguQ_GIAaGmec';
         const client = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // --- ĐOẠN CODE MỚI THÊM: Tự động đếm tổng số dòng khi mở web ---
         window.onload = async function() {
             const countElement = document.getElementById('totalCount');
-            const { count, error } = await client
-                .from('khach_hang_cai_app')
-                .select('*', { count: 'exact', head: true }); // Dùng head: true để chỉ lấy số đếm, không tải dữ liệu về gây nặng máy
+            const countAppPromise = client.from('khach_hang_cai_app').select('*', { count: 'exact', head: true });
+            const countTongPromise = client.from('tong_khach_hang').select('*', { count: 'exact', head: true });
+            
+            const [resApp, resTong] = await Promise.all([countAppPromise, countTongPromise]);
 
-            if (error) {
+            if (resApp.error) {
                 countElement.innerHTML = `<span style="color: red;">(Lỗi tải dữ liệu)</span>`;
             } else {
-                // Hiển thị định dạng (1.930)
-                countElement.innerHTML = `(${count.toLocaleString('vi-VN')})`;
+                const daCai = resApp.count || 0;
+                let text = `(Đã cài APP: ${daCai.toLocaleString('vi-VN')})`;
+                if (!resTong.error && resTong.count !== null) {
+                    text = `(Tổng KH: ${resTong.count.toLocaleString('vi-VN')} | Đã cài APP: ${daCai.toLocaleString('vi-VN')})`;
+                }
+                countElement.innerHTML = text;
             }
         };
-        // -------------------------------------------------------------
 
         function handleKeyPress(e) {
-            if (e.key === 'Enter') {
-                fetchData();
-            }
+            if (e.key === 'Enter') fetchData();
         }
 
         function highlightText(text, keywordStr) {
@@ -229,6 +201,14 @@
                 resultString = resultString.replace(regex, '<span class="highlight">$1</span>');
             });
             return resultString;
+        }
+
+        // Hàm che số điện thoại (Ví dụ: 0912345678 -> 09xxxxx678)
+        function cheSoDienThoai(soDT) {
+            if (!soDT) return '';
+            let s = String(soDT).trim();
+            if (s.length <= 5) return s; 
+            return s.substring(0, 2) + 'xxxxx' + s.substring(s.length - 3);
         }
 
         async function fetchData() {
@@ -243,37 +223,68 @@
             const safeKeyword = rawKeyword.replace(/,/g, ' ');
             const searchPattern = safeKeyword.replace(/\s+/g, '%');
 
-            resultBox.innerHTML = `<p style="color: #666; text-align: center; font-weight: bold;">⏳ Đang truy xuất dữ liệu từ máy chủ...</p>`;
+            resultBox.innerHTML = `<p style="color: #666; text-align: center; font-weight: bold;">⏳ Đang truy xuất đối chiếu dữ liệu...</p>`;
 
-            // 1. TỐI ƯU HÓA TUYỆT ĐỐI: Gỡ bỏ lệnh count, chỉ yêu cầu giới hạn đúng 11 dòng
-            const { data, error } = await client
-                .from('khach_hang_cai_app') 
-                .select('*') 
-                .or(`"Mã khách hàng".ilike.%${searchPattern}%,"Tên khách hàng".ilike.%${searchPattern}%`)
-                .limit(11); 
+            const queryTong = client.from('tong_khach_hang').select('*')
+                .or(`"Mã khách hàng".ilike.%${searchPattern}%,"Tên khách hàng".ilike.%${searchPattern}%`).limit(20);
+            const queryApp = client.from('khach_hang_cai_app').select('*')
+                .or(`"Mã khách hàng".ilike.%${searchPattern}%,"Tên khách hàng".ilike.%${searchPattern}%`).limit(20);
 
-            if (error) {
-                resultBox.innerHTML = `<div class="card"><div class="card-body"><p style="color: red; text-align: center; margin:0;">Lỗi kết nối: ${error.message}</p></div></div>`;
+            const [resTong, resApp] = await Promise.all([queryTong, queryApp]);
+
+            if (resTong.error && resApp.error) {
+                resultBox.innerHTML = `<div class="card"><div class="card-body"><p style="color: red; margin:0;">Lỗi kết nối máy chủ</p></div></div>`;
                 return;
             }
 
-            if (data.length > 0) {
-                // 2. XỬ LÝ LOGIC "N + 1"
-                const hasMore = data.length > 10; // Kiểm tra xem có chạm mức 11 không
-                const displayText = hasMore ? '> 10' : data.length; // Nếu có, ghi "> 10", ngược lại ghi số thực tế
-                const displayData = hasMore ? data.slice(0, 10) : data; // Dù tải 11 dòng, nhưng chỉ xuất ra màn hình 10 dòng đầu
+            const combinedMap = new Map();
+
+            if (resTong.data) {
+                resTong.data.forEach(item => {
+                    combinedMap.set(item['Mã khách hàng'], {
+                        'Mã khách hàng': item['Mã khách hàng'],
+                        'Tên khách hàng': item['Tên khách hàng'],
+                        'Số điện thoại': item['Số điện thoại'] || '',
+                        'Tên đơn vị quản lý': item['Tên đơn vị quản lý'] || '',
+                        'Tình Trạng': 'Chưa cài App',
+                        'Ngày liên kết lần đầu': '',
+                        'Ngày liên kết gần nhất': ''
+                    });
+                });
+            }
+
+            if (resApp.data) {
+                resApp.data.forEach(item => {
+                    const exist = combinedMap.get(item['Mã khách hàng']) || {};
+                    combinedMap.set(item['Mã khách hàng'], {
+                        'Mã khách hàng': item['Mã khách hàng'],
+                        'Tên khách hàng': item['Tên khách hàng'],
+                        'Số điện thoại': exist['Số điện thoại'] || '', 
+                        'Tên đơn vị quản lý': item['Tên đơn vị quản lý'] || exist['Tên đơn vị quản lý'] || '',
+                        'Tình Trạng': item['Tình Trạng'] || 'Đã cài App',
+                        'Ngày liên kết lần đầu': item['Ngày liên kết lần đầu'] || '',
+                        'Ngày liên kết gần nhất': item['Ngày liên kết gần nhất'] || ''
+                    });
+                });
+            }
+
+            const finalData = Array.from(combinedMap.values());
+
+            if (finalData.length > 0) {
+                const hasMore = finalData.length > 10;
+                const displayText = hasMore ? '> 10' : finalData.length;
+                const displayData = hasMore ? finalData.slice(0, 10) : finalData;
 
                 let html = `
                     <p style="color: #28a745; font-weight: bold; margin-bottom: 15px;">
-                        ✔ Tìm thấy ${displayText} kết quả <span style="font-weight: normal; color: #d32f2f; font-style: italic; font-size: 14px;">(Hệ thống chỉ hiện tối đa 10 kết quả)</span>:
+                        ✔ Tìm thấy ${displayText} kết quả <span style="font-weight: normal; color: #d32f2f; font-style: italic; font-size: 14px;">(Hiện tối đa 10)</span>:
                     </p>
                     <div class="card-container">
                 `;
                 
-                // 3. Vòng lặp xuất dữ liệu
                 displayData.forEach((thongTin, index) => {
                     const rawStatus = thongTin['Tình Trạng'] || '';
-                    const statusColor = rawStatus.toLowerCase().includes('đã cài') ? '#28a745' : '#d32f2f';
+                    const statusColor = rawStatus.toLowerCase().includes('đã cài') ? '#28a745' : '#757575';
 
                     html += `
                         <div class="card">
@@ -287,19 +298,23 @@
                                     <span class="data-value text-blue font-bold">${highlightText(thongTin['Mã khách hàng'], safeKeyword)}</span>
                                 </div>
                                 <div class="data-row">
-                                    <span class="data-label">Tên Khách Hàng:</span>
+                                    <span class="data-label">Tên KH:</span>
                                     <span class="data-value font-bold">${highlightText(thongTin['Tên khách hàng'], safeKeyword)}</span>
+                                </div>
+                                <div class="data-row">
+                                    <span class="data-label">Số ĐT:</span>
+                                    <span class="data-value font-bold">${cheSoDienThoai(thongTin['Số điện thoại'])}</span>
                                 </div>
                                 <div class="data-row">
                                     <span class="data-label">Đơn vị quản lý:</span>
                                     <span class="data-value">${thongTin['Tên đơn vị quản lý'] || ''}</span>
                                 </div>
                                 <div class="data-row">
-                                    <span class="data-label">Ngày liên kết đầu:</span>
+                                    <span class="data-label">Ngày LK đầu:</span>
                                     <span class="data-value">${thongTin['Ngày liên kết lần đầu'] || ''}</span>
                                 </div>
                                 <div class="data-row">
-                                    <span class="data-label">Ngày liên kết gần<br>nhất:</span> <!-- ĐÃ SỬA: Chèn thẻ <br> ngắt dòng -->
+                                    <span class="data-label">Ngày LK gần<br>nhất:</span>
                                     <span class="data-value">${thongTin['Ngày liên kết gần nhất'] || ''}</span>
                                 </div>
                             </div>
@@ -313,18 +328,12 @@
                 resultBox.innerHTML = `
                     <div class="card" style="background-color: #ffebee; border-color: #ffcdd2;">
                         <div class="card-body">
-                            <p style="color: #d32f2f; font-weight: bold; text-align: center; margin: 0;">Không tìm thấy khách hàng nào khớp với: "${rawKeyword}"</p>
+                            <p style="color: #d32f2f; font-weight: bold; text-align: center; margin: 0;">Không tìm thấy khách hàng nào</p>
                         </div>
                     </div>
                 `;
             }
         }
     </script>
-
-    <!-- Chữ ký cá nhân -->
-    <div class="watermark">
-        Người thiết lập:<br>
-        <strong>Chan Canh Chua (C3)</strong>
-    </div>
 </body>
 </html>
