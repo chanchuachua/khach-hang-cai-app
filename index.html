@@ -237,15 +237,18 @@
                 return;
             }
 
+// Người Sở Hữu: Chan Canh Chua (C3)
+            // Gộp dữ liệu thông minh bằng cấu trúc Map (Dùng Mã KH làm chìa khóa)
             const combinedMap = new Map();
 
+            // 1. Nhúng dữ liệu bảng TỔNG vào trước (Làm nền)
             if (resTong.data) {
                 resTong.data.forEach(item => {
                     combinedMap.set(item['Mã khách hàng'], {
                         'Mã khách hàng': item['Mã khách hàng'],
                         'Tên khách hàng': item['Tên khách hàng'],
                         'Số điện thoại': item['Số điện thoại'] || '',
-                        'Tên đơn vị quản lý': item['Tên đơn vị quản lý'] || '',
+                        'Tên đơn vị quản lý': item['Tên đơn vị quản lý'] || '', // Lấy từ bảng Tổng nếu có
                         'Tình Trạng': 'Chưa cài App',
                         'Ngày liên kết lần đầu': '',
                         'Ngày liên kết gần nhất': ''
@@ -253,13 +256,17 @@
                 });
             }
 
+            // 2. Nhúng dữ liệu bảng APP vào đè lên (ƯU TIÊN TUYỆT ĐỐI)
             if (resApp.data) {
                 resApp.data.forEach(item => {
                     const exist = combinedMap.get(item['Mã khách hàng']) || {};
                     combinedMap.set(item['Mã khách hàng'], {
                         'Mã khách hàng': item['Mã khách hàng'],
-                        'Tên khách hàng': item['Tên khách hàng'],
-                        'Số điện thoại': exist['Số điện thoại'] || '', 
+                        // Ưu tiên tên khách hàng bên App, nếu không có mới lấy bên Tổng
+                        'Tên khách hàng': item['Tên khách hàng'] || exist['Tên khách hàng'] || '',
+                        // Ưu tiên Số ĐT bên App, nếu không có mới lấy bên Tổng
+                        'Số điện thoại': item['Số điện thoại'] || exist['Số điện thoại'] || '', 
+                        // Ưu tiên Đơn vị quản lý bên App, nếu không có mới lấy bên Tổng
                         'Tên đơn vị quản lý': item['Tên đơn vị quản lý'] || exist['Tên đơn vị quản lý'] || '',
                         'Tình Trạng': item['Tình Trạng'] || 'Đã cài App',
                         'Ngày liên kết lần đầu': item['Ngày liên kết lần đầu'] || '',
