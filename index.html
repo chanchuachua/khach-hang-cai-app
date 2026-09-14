@@ -247,7 +247,7 @@
                     combinedMap.set(item['MA_KHANG'], {
                         'Mã khách hàng': item['MA_KHANG'],
                         'Tên khách hàng': item['TEN_KHANG'],
-                        'Số điện thoại': item['DTHOAI'] || '',
+                        'DTHOAI': item['DTHOAI'] || '',
                         'Tên đơn vị': item['TEN_DVQL'] || '', 
                         'Tên trạm': item['TEN_TRAM'] || '',   
                         'Tình Trạng': 'Chưa cài App',
@@ -263,7 +263,7 @@
                     combinedMap.set(item['Mã khách hàng'], {
                         'Mã khách hàng': item['Mã khách hàng'],
                         'Tên khách hàng': item['Tên khách hàng'] || exist['Tên khách hàng'] || '',
-                        'Số điện thoại': exist['Số điện thoại'] || '', 
+                        'DTHOAI': exist['DTHOAI'] || '', 
                         'Tên đơn vị': item['Tên đơn vị'] || exist['Tên đơn vị'] || '', 
                         'Tên trạm': exist['Tên trạm'] || '',
                         'Tình Trạng': item['Tình trạng'] || item['Tình Trạng'] || 'Đã cài App',
@@ -305,7 +305,7 @@
                         </div>
                         <div class="data-row">
                             <span class="data-label">Số ĐT:</span>
-                            <span class="data-value font-bold">${cheSoDienThoai(thongTin['Số điện thoại'])}</span>
+                            <span class="data-value font-bold">${cheSoDienThoai(thongTin['DTHOAI'])}</span>
                         </div>
                         <div class="data-row">
                             <span class="data-label">Tên đơn vị:</span>
