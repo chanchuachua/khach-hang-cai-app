@@ -221,7 +221,7 @@
 
             resultBox.innerHTML = `<p style="color: #666; text-align: center; font-weight: bold;">⏳ Đang truy xuất đối chiếu dữ liệu...</p>`;
 
-            const queryTong = client.from('tra_cuug').select('*')
+            const queryTong = client.from('tra_cuu').select('*')
                 .or(`MA_KHANG.ilike.%${searchPattern}%,TEN_KHANG.ilike.%${searchPattern}%`).limit(20);
             const queryApp = client.from('khach_hang_cai_app').select('*')
                 .or(`"Mã khách hàng".ilike.%${searchPattern}%,"Tên khách hàng".ilike.%${searchPattern}%`).limit(20);
