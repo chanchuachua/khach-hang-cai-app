@@ -207,14 +207,7 @@
             return resultString;
         }
 
-        function cheSoDienThoai(soDT) {
-            if (!soDT) return '';
-            let s = String(soDT).trim();
-            if (s.length <= 5) return s; 
-            return s.substring(0, 2) + 'xxxxx' + s.substring(s.length - 3);
-        }
-
-        async function fetchData() {
+            async function fetchData() {
             const rawKeyword = document.getElementById('searchInput').value.trim();
             const resultBox = document.getElementById('resultArea');
 
@@ -305,7 +298,7 @@
                         </div>
                         <div class="data-row">
                             <span class="data-label">Số ĐT:</span>
-                            <span class="data-value font-bold">${cheSoDienThoai(thongTin['DTHOAI'])}</span>
+                            <span class="data-value font-bold">${thongTin['DTHOAI']}</span>
                         </div>
                         <div class="data-row">
                             <span class="data-label">Tên đơn vị:</span>
