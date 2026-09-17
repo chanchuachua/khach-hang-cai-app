@@ -241,6 +241,7 @@
                         'Mã khách hàng': item['MA_KHANG'],
                         'Tên khách hàng': item['TEN_KHANG'],
                         'DTHOAI': item['DTHOAI'] || '',
+                        'Địa chỉ': item['DCHI_KH'] || '', // ĐÃ THÊM: Lấy dữ liệu cột Địa chỉ
                         'Tên đơn vị': item['TEN_DVQL'] || '', 
                         'Tên trạm': item['TEN_TRAM'] || '',   
                         'Tình Trạng': 'Chưa cài App',
@@ -257,6 +258,7 @@
                         'Mã khách hàng': item['Mã khách hàng'],
                         'Tên khách hàng': item['Tên khách hàng'] || exist['Tên khách hàng'] || '',
                         'DTHOAI': exist['DTHOAI'] || '', 
+                        'Địa chỉ': exist['Địa chỉ'] || '', // ĐÃ THÊM: Giữ nguyên địa chỉ từ bảng tra_cuu
                         'Tên đơn vị': item['Tên đơn vị'] || exist['Tên đơn vị'] || '', 
                         'Tên trạm': exist['Tên trạm'] || '',
                         'Tình Trạng': item['Tình trạng'] || item['Tình Trạng'] || 'Đã cài App',
@@ -281,7 +283,6 @@
                 `;
                 
                 displayData.forEach((thongTin, index) => {
-                    // ĐÃ SỬA: Ép kiểu hiển thị chuẩn "Đã cài App" và "Chưa cài App"
                     let rawStatus = thongTin['Tình Trạng'] || '';
                     const isDaCai = rawStatus.toLowerCase().includes('đã cài');
                     rawStatus = isDaCai ? 'Đã cài App' : 'Chưa cài App';
@@ -301,10 +302,14 @@
                             <span class="data-value font-bold">${thongTin['DTHOAI']}</span>
                         </div>
                         <div class="data-row">
+                            <span class="data-label">Địa chỉ:</span>
+                            <span class="data-value">${thongTin['Địa chỉ']}</span>
+                        </div>
+                        <div class="data-row">
                             <span class="data-label">Tên đơn vị:</span>
                             <span class="data-value">${thongTin['Tên đơn vị']}</span>
                         </div>
-                    `;
+                    `; // ĐÃ THÊM: Khối hiển thị Địa chỉ lên thẻ
 
                     if (isDaCai) {
                         cardBodyHtml += `
